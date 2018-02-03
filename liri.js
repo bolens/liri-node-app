@@ -3,6 +3,7 @@ const spotifyKeys = require("./spotifyKeys.js");
 const request = require("request");
 const fs = require("fs");
 const file = "./random.txt";
+const logFile = "./log.txt";
 
 var action = process.argv[2];
 var input;
@@ -35,11 +36,11 @@ function run() {
       runRandom();
       break;
     default:
-      console.log("Please enter a valid action.  Valid actions are as follows:");
-      console.log("my-tweets");
-      console.log("spotify-this-song '<song name>'");
-      console.log("movie-this '<movie name>'");
-      console.log('do-what-it-says');
+      logStuff("Please enter a valid action.  Valid actions are as follows:");
+      logStuff("my-tweets");
+      logStuff("spotify-this-song '<song name>'");
+      logStuff("movie-this '<movie name>'");
+      logStuff('do-what-it-says');
   }
 }
 
@@ -51,9 +52,9 @@ function twitter() {
     if (!error && response.statusCode === 200) {
       // console.log(tweets);
       for (var i = 0; i < tweets.length; i++) {
-        console.log(tweets[i].text);
-        console.log(tweets[i].created_at);
-        console.log('');
+        logStuff(tweets[i].text);
+        logStuff(tweets[i].created_at);
+        logStuff('');
       }
     }
   });
@@ -78,14 +79,14 @@ function spotify(songName) {
           artists += data.artists[i].name + ", ";
         }
         artists += data.artists[data.artists.length - 1].name;
-        console.log("Artists: " + artists);
+        logStuff("Artists: " + artists);
       } else {
-        console.log("Artist: " + data.artists[0].name);
+        logStuff("Artist: " + data.artists[0].name);
       }
 
-      console.log("Title: " + data.name);
-      console.log("Preview: " + data.preview_url);
-      console.log("Album: " + data.album.name);
+      logStuff("Title: " + data.name);
+      logStuff("Preview: " + data.preview_url);
+      logStuff("Album: " + data.album.name);
     } else {
       return console.log('Error occurred: ' + error);
     }
@@ -101,11 +102,11 @@ function movie(movieName) {
     if (!error && response.statusCode === 200) {
       // console.log(JSON.parse(body));
 
-      console.log(JSON.parse(body).Title + " (" + JSON.parse(body).Year + ")");
-      console.log("IMDB: " + JSON.parse(body).Ratings[0].Value + " | Rotten Tomatoes: " + JSON.parse(body).Ratings[0].Value);
-      console.log(JSON.parse(body).Country + ", " + JSON.parse(body).Language);
-      console.log(JSON.parse(body).Plot);
-      console.log("Actors: " + JSON.parse(body).Actors);
+      logStuff(JSON.parse(body).Title + " (" + JSON.parse(body).Year + ")");
+      logStuff("IMDB: " + JSON.parse(body).Ratings[0].Value + " | Rotten Tomatoes: " + JSON.parse(body).Ratings[0].Value);
+      logStuff(JSON.parse(body).Country + ", " + JSON.parse(body).Language);
+      logStuff(JSON.parse(body).Plot);
+      logStuff("Actors: " + JSON.parse(body).Actors);
     }
 
   });
@@ -121,5 +122,17 @@ function runRandom() {
     } else {
       return console.log(error);
     }
+  });
+}
+
+function logStuff(stuff) {
+  fs.appendFile(logFile, stuff + '\n', function(err) {
+    if (err) {
+      console.log(err);
+    }
+    else {
+      console.log(stuff);
+    }
+
   });
 }
